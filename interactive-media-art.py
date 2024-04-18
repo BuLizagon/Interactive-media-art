@@ -1,6 +1,7 @@
 import cv2
 from ultralytics import YOLO
-
+# import serial
+# ser = serial.Serial('COM7', 9600)
 cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
@@ -16,24 +17,33 @@ while True:
 
     results = model(frame)
 
-
+    x = 0
+    y = 0
     #사람 수 세기
     # num_objects = len(results[0].boxes.xyxy)
 
     # print("Number of recognized objects:", num_objects)
+    x1 = int(results[0].boxes.xyxy[0][0])
+    x2 = int(results[0].boxes.xyxy[0][2])
 
-    x = int(results[0].boxes.xyxy[0][2]) - int(results[0].boxes.xyxy[0][0])
-    y = int(results[0].boxes.xyxy[0][3]) - int(results[0].boxes.xyxy[0][1])
+    y1 = int(results[0].boxes.xyxy[0][1])
+    y2 = int(results[0].boxes.xyxy[0][3])
+
+    x = int((results[0].boxes.xyxy[0][2] + results[0].boxes.xyxy[0][0])/2)
+    y = int((results[0].boxes.xyxy[0][3] + results[0].boxes.xyxy[0][1])/2)
     
     #Unreal x, y의 값
-    unreal_x = round((x-320)/320, 1)
-    unreal_y = round(((y-240)/240)*(-1), 1)
+    unreal_x = int(round((x-320)/320, 2)*50)
+    unreal_y = int(round(((y-240)/240)*(-1), 2)*50)
 
-    # print(unreal_x, unreal_y)
+    print(unreal_x, unreal_y)
 
-    annotated_frame = results[0].plot()
+    # frame = results[0].plot()
 
-    cv2.imshow('frame', annotated_frame)
+    #화면에 표시
+    cv2.circle(frame, (x, y), 3, (0, 255, 0), -1)
+    cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+    cv2.imshow('frame', frame)
 
     if cv2.waitKey(1) == ord('q'):
         break
