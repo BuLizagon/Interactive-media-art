@@ -1,7 +1,8 @@
 import cv2
 from ultralytics import YOLO
-# import serial
-# ser = serial.Serial('COM7', 9600)
+import serial
+ser = serial.Serial('COM7', 9600)
+
 cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
@@ -36,7 +37,10 @@ while True:
     unreal_x = int(round((x-320)/320, 2)*50)
     unreal_y = int(round(((y-240)/240)*(-1), 2)*50)
 
-    print(unreal_x, unreal_y)
+    mes_x = str(unreal_x)+':\n'
+    mes_y = str(unreal_y)+':\n'
+    ser.write(mes_x.encode())
+    ser.write(mes_y.encode())
 
     # frame = results[0].plot()
 
