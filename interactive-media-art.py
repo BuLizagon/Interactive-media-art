@@ -1,11 +1,24 @@
 import cv2
 from ultralytics import YOLO
 import serial
+import mediapipe as mp
 ser = serial.Serial('COM7', 9600)
 
 cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+
+mp_face_mesh = mp.solutions.face_mesh
+
+mp_drawing = mp.solutions.drawing_utils
+
+drawing_spec = mp_drawing.DrawingSpec(thickness = 1, color = (0,0,255))
+
+face_mesh = mp_face_mesh.FaceMesh(
+    # max_num_faces=100,
+    min_detection_confidence = 0.7,
+    min_tracking_confidence = 0.7
+)
 
 # Load a model
 # model = YOLO("yolov8n.yaml")  # build a new model from scratch
@@ -41,6 +54,12 @@ while True:
     mes_y = str(unreal_y)+':\n'
     ser.write(mes_x.encode())
     ser.write(mes_y.encode())
+
+     #특징 추출
+    mediaPipe_results = face_mesh.process(frame)
+
+    if mediaPipe_results.multi_face_landmarks:
+        print('웃기')
 
     # frame = results[0].plot()
 
