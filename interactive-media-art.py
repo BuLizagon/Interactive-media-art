@@ -65,12 +65,16 @@ while True:
 
     if mediaPipe_results.multi_face_landmarks:
         print('웃기')
+        message = "smile:\n"
+        ser.write(message.encode())
 
     end = time.time()
 
     #고개 돌리기
     if end-start>=3:
         print("고개 돌리기")
+        message = "neck:\n"
+        ser.write(message.encode())
 
     # frame = results[0].plot()
 
