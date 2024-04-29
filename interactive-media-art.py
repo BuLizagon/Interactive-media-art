@@ -55,7 +55,7 @@ while True:
         max_box = []
         x = 0
         y = 0
-
+        
         for i in yolo_results[0].boxes.xyxy:
             x1 = i[0]
             y1 = i[1]
@@ -70,8 +70,7 @@ while True:
 
                 max_box.append(x2)
                 max_box.append(y2)
-            
-            
+
             if len(max_box)!=0:
                 x1 = int(max_box[0])
                 x2 = int(max_box[2])
@@ -79,16 +78,18 @@ while True:
                 y1 = int(max_box[1])
                 y2 = int(max_box[3])
 
-                x = int((x2+x1)/2)
-                y = int(y1)
-                # y = int((y2+y1)/2)
+                x = int((((x2+x1)/2)-320)/320*50)
+                # y = int(y1)
+                y = int((((y2+y1)/2)-240)/240*(-50))
+
+                print(x, y)
 
                 mes_x = str(x)+':\n'
                 mes_y = str(y)+':\n'
                 ser.write(mes_x.encode())
                 ser.write(mes_y.encode())
 
-                cv2.circle(frame, (x, y), 3, (0, 255, 0), -1)
+                cv2.circle(frame, (x, y), 3, (0, 0, 255), -1)
 
                 cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
@@ -97,29 +98,29 @@ while True:
 
         #고개 돌리기
         if end-start>=3:
-            #고개 돌리는 거 표시
-            count=1
-            #언리얼로 해결해야 할 점 값(값을 하나 지속적으로 보내면 되지 않을까)
-            print("고개 돌리기")
-            message = "neck:\n"
+            message = "r1:\n"
+            ser.write(message.encode())
+        else:
+            message = "r0:\n"
             ser.write(message.encode())
 
         #웃기
         if mediaPipe_results.multi_face_landmarks:
-            # if count==1:
+            if count==1:
                 print('웃기')
                 message = "smile:\n"
                 ser.write(message.encode())
+                time.sleep(0.3)
 
-    
     #사용자 인식 없음
     else:
         start = time.time()
-
-        print("정지 이미지")
-        message = "stop:\n"
+        message = "0:\n0:\nr0:\n"
         ser.write(message.encode())
         continue
+    
+
+    # time.sleep(0.3)
 
     cv2.imshow('frame', frame)
 
