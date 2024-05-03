@@ -33,6 +33,9 @@ start = time.time()
 #고개 돌리는 거 임의 값
 count=0
 
+user_x = 0
+user_y = 0
+
 while True:
     ret, frame = cap.read()
 
@@ -82,45 +85,157 @@ while True:
                 # y = int(y1)
                 y = int((((y2+y1)/2)-240)/240*(-50))
 
-                print(x, y)
+                while True:
 
-                mes_x = str(x)+':\n'
-                mes_y = str(y)+':\n'
-                ser.write(mes_x.encode())
-                ser.write(mes_y.encode())
+                    #고개 동작할 때
+                    if end-start>=3:
+                        #눈동자 동작
+                        if int(x/10)==int(user_eye_x/10)==int(user_neck_x/10) and int(y/10)==int(user_eye_y/10)==int(user_neck_y/10):
+                            user_eye_x = x
+                            user_eye_y = y
+                            user_neck_x = x
+                            user_neck_y = y
+                            message = f"{user_eye_x},{user_eye_y},r1,\n"
+                            # message = f"{user_eye_x},{user_eye_y},{user_neck_x},{user_neck_y},r1,\n"
+                            ser.write(message.encode())
+                            time.sleep(0.05)
+                            print('eye0:'+message)
+                            break
+                            
+                        else:
+                            #눈동자 동작
+                            if int(x/10)==int(user_eye_x/10):
+                                user_eye_x = x
+                            elif x>user_eye_x:
+                                user_eye_x += 10
+                            elif x<user_eye_x:
+                                user_eye_x -= 10
+                            
+                            if int(y/10)==int(user_eye_y/10):
+                                user_eye_y = y
+                            elif y>user_eye_y:
+                                user_eye_y += 10
+                            elif y<user_eye_y:
+                                user_eye_y -= 10
+
+                            #고개 동작
+                            if int(x/10)==int(user_neck_x/10):
+                                user_neck_x = x
+                            elif x>user_neck_x:
+                                user_neck_x += 10
+                            elif x<user_neck_x:
+                                user_neck_x -= 10
+                            
+                            if int(y/10)==int(user_neck_y/10):
+                                user_neck_y = y
+                            elif y>user_neck_y:
+                                user_neck_y += 10
+                            elif y<user_neck_y:
+                                user_neck_y -= 10
+
+                            message = f"{user_eye_x},{user_eye_y},r1,\n"
+                            # message = f"{user_eye_x},{user_eye_y},{user_neck_x},{user_neck_y},r1,\n"
+                            ser.write(message.encode())
+                            time.sleep(0.05)
+                            print('eye1:'+message)
+                    #고개 동작 안 할 때
+                    else:
+                        #눈동자 동작
+                        if int(x/10)==int(user_eye_x/10) and int(y/10)==int(user_eye_y/10):
+                            user_eye_x = x
+                            user_eye_y = y
+                            message = f"{user_eye_x},{user_eye_y},r1,\n"
+                            # message = f"{user_eye_x},{user_eye_y},{user_neck_x},{user_neck_y},r0,\n"
+                            ser.write(message.encode())
+                            time.sleep(0.05)
+                            print('eye0:'+message)
+                            break
+                            
+                        else:
+                            #눈동자 동작
+                            if int(x/10)==int(user_eye_x/10):
+                                user_eye_x = x
+                            elif x>user_eye_x:
+                                user_eye_x += 10
+                            elif x<user_eye_x:
+                                user_eye_x -= 10
+                            
+                            if int(y/10)==int(user_eye_y/10):
+                                user_eye_y = y
+                            elif y>user_eye_y:
+                                user_eye_y += 10
+                            elif y<user_eye_y:
+                                user_eye_y -= 10
+
+                            message = f"{user_eye_x},{user_eye_y},r1,\n"
+                            # message = f"{user_eye_x},{user_eye_y},{user_neck_x},{user_neck_y},r0,\n"
+                            ser.write(message.encode())
+                            time.sleep(0.05)
+                            print('eye1:'+message)
 
                 cv2.circle(frame, (x, y), 3, (0, 0, 255), -1)
 
                 cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
-        #특징 추출
-        mediaPipe_results = face_mesh.process(frame)
+        # #특징 추출
+        # mediaPipe_results = face_mesh.process(frame)
 
-        #고개 돌리기
-        if end-start>=3:
-            message = "r1:\n"
-            ser.write(message.encode())
-        else:
-            message = "r0:\n"
-            ser.write(message.encode())
-
-        #웃기
-        if mediaPipe_results.multi_face_landmarks:
-            if count==1:
-                print('웃기')
-                message = "smile:\n"
-                ser.write(message.encode())
-                time.sleep(0.3)
+        # #웃기
+        # if mediaPipe_results.multi_face_landmarks:
+        #     if count==1:
+        #         print('웃기')
+        #         message = "smile:\n"
+        #         ser.write(message.encode())
 
     #사용자 인식 없음
     else:
-        start = time.time()
-        message = "0:\n0:\nr0:\n"
-        ser.write(message.encode())
-        continue
-    
+        x = 0
+        y = 0
 
-    # time.sleep(0.3)
+        while True:
+            #눈동자 목 모두 일치되면 정지
+            if int(x/10)==int(user_eye_x/10)==int(user_neck_x/10) and int(y/10)==int(user_eye_y/10)==int(user_neck_y/10):
+                message = f"{user_eye_x},{user_eye_y},r1,\n"
+                # message = f"{user_eye_x},{user_eye_y},{user_neck_x},{user_neck_y},r0,\n"
+                ser.write(message.encode())
+                time.sleep(0.05)
+                print('eye2:'+message)
+                break
+                
+            else:
+                if int(x/10)==int(user_eye_x/10):
+                    user_eye_x = x
+                elif x<user_eye_x:
+                    user_eye_x -= 10
+                elif x>user_eye_x:
+                    user_eye_x += 10
+                
+                if int(y/10)==int(user_eye_y/10):
+                    user_eye_y = y
+                elif y<user_eye_y:
+                    user_eye_y -= 10
+                elif y>user_eye_y:
+                    user_eye_y += 10
+
+                if int(x/10)==int(user_neck_x/10):
+                    user_neck_x = x
+                elif x<user_neck_x:
+                    user_neck_x -= 10
+                elif x>user_neck_x:
+                    user_neck_x += 10
+                
+                if int(y/10)==int(user_neck_y/10):
+                    user_neck_y = y
+                elif y<user_neck_y:
+                    user_neck_y -= 10
+                elif y>user_neck_y:
+                    user_neck_y += 10
+                
+                message = f"{user_eye_x},{user_eye_y},r1,\n"
+                # message = f"{user_eye_x},{user_eye_y},{user_neck_x},{user_neck_y},r0,\n"
+                ser.write(message.encode())
+                time.sleep(0.05)
+                print('eye3:'+message)
 
     cv2.imshow('frame', frame)
 
