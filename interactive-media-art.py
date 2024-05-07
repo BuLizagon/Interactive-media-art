@@ -64,7 +64,7 @@ while True:
             y1 = i[1]
             x2 = i[2]
             y2 = i[3]
-            area = (int(x2)-int(x1))*(int(y2)-int(y1))
+            area = abs(int(x2)-int(x1))*abs(int(y2)-int(y1))
             
             if area > max_area:
                 max_area = area
