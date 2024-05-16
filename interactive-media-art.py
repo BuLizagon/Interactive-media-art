@@ -195,6 +195,10 @@ while True:
         while True:
             #눈동자 목 모두 일치되면 정지
             if int(x/10)==int(user_eye_x/10)==int(user_neck_x/10) and int(y/10)==int(user_eye_y/10)==int(user_neck_y/10):
+                user_eye_x = x
+                user_eye_y = y
+                user_neck_x = x
+                user_neck_y = y
                 message = f"{user_eye_x},{user_eye_y},r1,\n"
                 # message = f"{user_eye_x},{user_eye_y},{user_neck_x},{user_neck_y},r0,\n"
                 ser.write(message.encode())
@@ -206,36 +210,39 @@ while True:
                 if int(x/10)==int(user_eye_x/10):
                     user_eye_x = x
                 elif x<user_eye_x:
-                    user_eye_x -= 10
+                    user_eye_x -= 1
                 elif x>user_eye_x:
-                    user_eye_x += 10
+                    user_eye_x += 1
                 
                 if int(y/10)==int(user_eye_y/10):
                     user_eye_y = y
                 elif y<user_eye_y:
-                    user_eye_y -= 10
+                    user_eye_y -= 1
                 elif y>user_eye_y:
-                    user_eye_y += 10
+                    user_eye_y += 1
 
                 if int(x/10)==int(user_neck_x/10):
                     user_neck_x = x
                 elif x<user_neck_x:
-                    user_neck_x -= 10
+                    user_neck_x -= 1
                 elif x>user_neck_x:
-                    user_neck_x += 10
+                    user_neck_x += 1
                 
                 if int(y/10)==int(user_neck_y/10):
                     user_neck_y = y
                 elif y<user_neck_y:
-                    user_neck_y -= 10
+                    user_neck_y -= 1
                 elif y>user_neck_y:
-                    user_neck_y += 10
+                    user_neck_y += 1
                 
                 message = f"{user_eye_x},{user_eye_y},r1,\n"
                 # message = f"{user_eye_x},{user_eye_y},{user_neck_x},{user_neck_y},r0,\n"
                 ser.write(message.encode())
                 time.sleep(0.05)
                 print('eye3:'+message)
+    
+
+        start = time.time()
 
     cv2.imshow('frame', frame)
 
