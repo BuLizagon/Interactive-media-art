@@ -67,7 +67,7 @@ while True:
         num_objects = len(yolo_results[0].boxes.xyxy)
 
         #면적 계산(가장 가까운 사람일수록 면적이 크다)
-        max_area = 0
+        min_distance = 100
         max_box = []
         x = 0
         y = 0
@@ -77,23 +77,18 @@ while True:
             x2 = i[2]
             y2 = i[3]
 
-            if len(max_box)==0:
-                pre_x = x
-                pre_y = y
+            now_x = int((((x2+x1)/2)-320)/320*100)
+            now_y = int((((y2+y1)/2)-240)/240*(-100)+20)
+            distance = int(((now_x-pre_x)**2 + (now_y-pre_y)**2)**(1/2))
+
+            if distance < min_distance:
+                min_distance = distance
+                max_box=[]
                 max_box.append(x1)
                 max_box.append(y1)
 
                 max_box.append(x2)
                 max_box.append(y2)
-            
-            else:
-                if pre_x-10<=x<=pre_x+10 and pre_y-10<=y<=pre_y+10:
-                    max_box=[]
-                    max_box.append(x1)
-                    max_box.append(y1)
-
-                    max_box.append(x2)
-                    max_box.append(y2)
 
 
         if len(max_box)!=0:
