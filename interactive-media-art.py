@@ -30,19 +30,19 @@ model.predict(classes=0, conf=0.8)
 
 start = time.time()
 
-#고개 돌리는 거 임의 값
-count=0
-
 user_eye_x = 0
 user_eye_y = 0
 
 user_neck_x = 0
 user_neck_y = 0
 
+#현재 위치값
+x = 0
+y = 0
+
 #이전 위치값
 pre_x = 0
 pre_y = 0
-
 
 while True:
 
@@ -60,17 +60,16 @@ while True:
 
     #사용자 인식 있음
     if yolo_results[0]:
-        
+
         end = time.time()
 
         #인식한 수 세기
         num_objects = len(yolo_results[0].boxes.xyxy)
 
-        #면적 계산(가장 가까운 사람일수록 면적이 크다)
-        min_distance = 100
+        #거리 계산
+        min_distance = 1000
         max_box = []
-        x = 0
-        y = 0
+        
         for i in yolo_results[0].boxes.xyxy:
             x1 = i[0]
             y1 = i[1]
@@ -90,7 +89,6 @@ while True:
                 max_box.append(x2)
                 max_box.append(y2)
 
-
         if len(max_box)!=0:
             x1 = int(max_box[0])
             x2 = int(max_box[2])
@@ -101,6 +99,9 @@ while True:
             x = int((((x2+x1)/2)-320)/320*100)
             # y = int(y1)
             y = int((((y2+y1)/2)-240)/240*(-100)+20)
+
+            pre_x = x
+            pre_y = y
 
             while True:
                 #고개 동작할 때
@@ -113,6 +114,7 @@ while True:
                         user_neck_y = y
                         message = f"{user_eye_x},{user_eye_y}.{user_neck_x},{user_neck_y}.1\n"
                         ser.write(message.encode())
+                        print('eye0:'+message)
                         break
                         
                     else:
@@ -148,6 +150,7 @@ while True:
 
                         message = f"{user_eye_x},{user_eye_y}.{user_neck_x},{user_neck_y}.1\n"
                         ser.write(message.encode())
+                        print('eye1:'+message)
                 #고개 동작 안 할 때
                 else:
                     #눈동자 동작
@@ -156,6 +159,7 @@ while True:
                         user_eye_y = y
                         message = f"{user_eye_x},{user_eye_y}.{user_neck_x},{user_neck_y}.0\n"
                         ser.write(message.encode())
+                        print('eye0:'+message)
                         break
                         
                     else:
@@ -176,6 +180,7 @@ while True:
 
                         message = f"{user_eye_x},{user_eye_y}.{user_neck_x},{user_neck_y}.0\n"
                         ser.write(message.encode())
+                        print('eye1:'+message)
                     
             cv2.circle(frame, (int((x1+x2)/2), int((y1+y2)/2)-20), 3, (0, 0, 255), 2)
 
@@ -185,6 +190,11 @@ while True:
     else:
         x = 0
         y = 0
+        
+        #이전 위치값
+        pre_x = 0
+        pre_y = 0
+
         while True:
             #눈동자 목 모두 일치되면 정지
             if int(x/10)==int(user_eye_x/10)==int(user_neck_x/10) and int(y/10)==int(user_eye_y/10)==int(user_neck_y/10):
@@ -194,6 +204,7 @@ while True:
                 user_neck_y = y
                 message = f"{user_eye_x},{user_eye_y}.{user_neck_x},{user_neck_y}.0\n"
                 ser.write(message.encode())
+                print('eye2:'+message)
                 break
                 
             else:
@@ -227,13 +238,15 @@ while True:
                 
                 message = f"{user_eye_x},{user_eye_y}.{user_neck_x},{user_neck_y}.0\n"
                 ser.write(message.encode())
+                print('eye3:'+message)
     
 
         start = time.time()
-    
+        
     cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
     cv2.imshow('frame', frame)
     
+
     if cv2.waitKey(1) == ord('q'):
         break
 ser.close()
